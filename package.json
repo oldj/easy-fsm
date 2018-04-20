@@ -1,0 +1,41 @@
+{
+  "name": "easy-fsm",
+  "version": "1.0.0",
+  "description": "An easy-to-use finite state machine system for JavaScript.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oldj/easy-fsm.git"
+  },
+  "keywords": [
+    "fsm"
+  ],
+  "author": "oldj",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oldj/easy-fsm/issues"
+  },
+  "homepage": "https://github.com/oldj/easy-fsm#readme",
+  "devDependencies": {
+    "ava": "^0.25.0"
+  },
+  "ava": {
+    "files": [
+      "src/**/*.spec.js",
+      "test/*.spec.js",
+      "!**/node_modules/**/*.*"
+    ],
+    "source": [
+      "**/*.js",
+      "!dist/**/*"
+    ],
+    "match": [],
+    "concurrency": 5,
+    "failFast": true,
+    "tap": true,
+    "powerAssert": false
+  }
+}

@@ -47,3 +47,33 @@ test('basic', async t => {
   t.true(/bad event/.test(err))
 })
 
+test.only('switch', async t => {
+  let machine = fsm.create({
+    initial: 'off',
+    states: {
+      off: {
+        on: {
+          turn_on: 'on'
+        }
+      },
+      on: {
+        on: {
+          turn_off: 'off'
+        }
+      }
+    }
+  })
+
+  machine.onEnterOff = () => console.log('enter state: off')
+  machine.onOff = () => console.log('on state: off')
+  machine.onLeaveOff = () => console.log('leave state: off')
+  machine.onEnterOn = () => console.log('enter state: on')
+  machine.onOn = () => console.log('on state: on')
+  machine.onLeaveOn = () => console.log('leave state: on')
+
+  t.is(machine.getState(), 'off')
+  await machine.fire('turn_on')
+  t.is(machine.getState(), 'on')
+  await machine.fire('turn_off')
+  t.is(machine.getState(), 'off')
+})

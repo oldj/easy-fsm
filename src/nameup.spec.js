@@ -1,5 +1,5 @@
 /**
- * nameup.spec.js.js
+ * nameup.spec.js
  */
 
 const {test} = require('ava')

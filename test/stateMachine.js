@@ -1,5 +1,5 @@
 /**
- * state.js
+ * stateMachine.js
  */
 
 const fsm = require('../src')

@@ -1,5 +1,5 @@
 /**
- * index.spec.js.js
+ * index.spec.js
  */
 
 

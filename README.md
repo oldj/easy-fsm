@@ -54,24 +54,26 @@ console.log(machine.getState()) // loading
 
 You can use `fsm.create(options)` to create a finite state machine.
 
- - **fire(event)**
+ - **fire(event, [...args])**
 
- Fire an event on current state.
+   Fire an event on current state.
 
  - **canFire(event)**
  
- Detect if the specified `event` can be fired.
+   Detect if the specified `event` can be fired.
  
  - **getState()**
  
- Get the current state.
+   Get the current state.
  
  - **getLastState()**
  
- Get the last state.
+   Get the last state.
 
 Every State has three actions:
 
  - **onEnterState()**
  - **OnState()**
  - **OnLeaveState()**
+
+**Note:** The action names will be converted to camel-style, for example, a state named `loading_some_files` will corresponds to action `onEnterLoadingSomeFiles`, `onLoadingSomeFiles` and `onLeaveLoadingSomeFiles`.

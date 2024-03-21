@@ -2,7 +2,19 @@
  * Machine.ts
  */
 
-import { ActionFunc, IMachineConfigs, IMachineState, StateAction } from './types'
+export type StateAction = 'enter' | 'leave'
+export type ActionFunc = (...args: any[]) => void | Promise<void>
+
+export interface IMachineState {
+  on?: Record<string /* event */, string /* to state */>
+}
+
+export interface IMachineConfigs {
+  initial: string // initial state
+  states: {
+    [key: string /* state */]: IMachineState
+  }
+}
 
 export default class Machine<TConfigs extends IMachineConfigs> {
   private readonly configs: IMachineConfigs

@@ -3,7 +3,7 @@
  */
 
 import { expect, test } from 'vitest'
-import { nameUp } from './utils'
+import { nameUp } from '../src/utils'
 
 test('basic', (t) => {
   expect(nameUp('on_leave_init')).toBe('onLeaveInit')

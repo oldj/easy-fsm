@@ -2,7 +2,7 @@
  * stateMachine.js
  */
 
-import { IMachineConfigs } from '@/types'
+import { IMachineConfigs } from '../src/Machine'
 import fsm from '../src'
 
 export const make = () => {

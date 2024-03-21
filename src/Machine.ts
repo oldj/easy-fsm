@@ -87,26 +87,37 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     return this.next_state
   }
 
-  onStateChange(state: string, action: StateAction, callback: ActionFunc) {
-    // do nothing
+  private onStateChange(
+    state: keyof TConfigs['states'],
+    action: StateAction,
+    callback: ActionFunc,
+  ) {
+    if (!this.states.hasOwnProperty(state)) {
+      throw new Error(`invalid state: ${state.toString()}`)
+    }
+
     let key = `${state.toString()}_${action}`
     let fns = this.listeners_for_state_change[key] || []
     fns.push(callback)
     this.listeners_for_state_change[key] = fns
   }
 
-  offStateChange(state: string, action: StateAction, callback: ActionFunc) {
+  private offStateChange(
+    state: keyof TConfigs['states'],
+    action: StateAction,
+    callback: ActionFunc,
+  ) {
     let key = `${state.toString()}_${action}`
     let fns = this.listeners_for_state_change[key] || []
     fns = fns.filter((fn) => fn !== callback)
     this.listeners_for_state_change[key] = fns
   }
 
-  onEnter(state: string, callback: ActionFunc) {
+  onEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
     this.onStateChange(state, 'enter', callback)
   }
 
-  onLeave(state: string, callback: ActionFunc) {
+  onLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
     this.onStateChange(state, 'leave', callback)
   }
 }

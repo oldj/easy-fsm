@@ -2,8 +2,8 @@
  * index.ts
  */
 
-import Machine, { IMachineConfigs } from './Machine'
+import Machine from './Machine'
 
-export default {
-  create: (configs: IMachineConfigs) => new Machine(configs),
-}
+const EasyFSM = Machine
+
+export default EasyFSM

@@ -3,10 +3,10 @@
  */
 
 import { IMachineConfigs } from '../src/Machine'
-import fsm from '../src'
+import EasyFSM from '../src'
 
 export const make = () => {
-  const configs: IMachineConfigs = {
+  const configs = {
     initial: 'init',
     states: {
       init: {
@@ -75,5 +75,5 @@ export const make = () => {
     },
   }
 
-  return fsm.create(configs)
+  return new EasyFSM(configs)
 }

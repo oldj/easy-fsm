@@ -11,9 +11,9 @@ npm install easy-fsm
 ## usage
 
 ```TypeScript
-import fsm from 'easy-fsm'
+import EasyFSM from 'easy-fsm'
 
-let machine = fsm.create({
+let fsm = new EasyFSM({
   initial: 'init',
   states: {
     init: {
@@ -25,14 +25,14 @@ let machine = fsm.create({
   }
 })
 
-console.log(machine.getState()) // init
-await machine.fire('loaded')
-console.log(machine.getState()) // ready
+console.log(fsm.getState()) // init
+await fsm.fire('loaded')
+console.log(fsm.getState()) // ready
 ```
 
 ## APIs
 
-You can use `fsm.create(options)` to create a finite state machine.
+You can use `new EasyFSM(options)` to create a finite state machine.
 
 - **fire(event)**
 

@@ -4,7 +4,9 @@
   "description": "An easy-to-use finite state machine system for JavaScript/TypeScript.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "vitest --run",
     "build": "vite build"

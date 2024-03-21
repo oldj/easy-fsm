@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "strict": true,
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@root/*": [
+        "./*"
+      ]
+    },
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "typings.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "docs",
+    "lib",
+    "es",
+    "dist",
+    "typings",
+    "**/__test__",
+  ]
+}

@@ -10,8 +10,8 @@ npm install easy-fsm
 
 ## usage
 
-```javascript
-const fsm = require('easy-fsm')
+```TypeScript
+import fsm from 'easy-fsm'
 
 let machine = fsm.create({
   initial: 'init',
@@ -34,18 +34,26 @@ console.log(machine.getState()) // ready
 
 You can use `fsm.create(options)` to create a finite state machine.
 
- - **fire(event)**
+- **fire(event)**
 
- Fire an event on current state.
+Fire an event on current state.
 
- - **canFire(event)**
- 
- Detect if the specified `event` can be fired.
- 
- - **getState()**
- 
- Get the current state.
- 
- - **getLastState()**
- 
- Get the last state.
+- **canFire(event)**
+
+Detect if the specified `event` can be fired.
+
+- **getState()**
+
+Get the current state.
+
+- **getPreviousState()**
+
+Get the last state.
+
+- **onEnter(state, callback)**
+
+Execute `callback` when entering `state`.
+
+- **onLeave(state, callback)**
+
+Execute `callback` when leaving `state`.

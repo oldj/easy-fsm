@@ -4,7 +4,8 @@
   "description": "An easy-to-use finite state machine system for JavaScript.",
   "main": "src/index.js",
   "scripts": {
-    "test": "ava"
+    "test": "vitest --run",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",
@@ -20,22 +21,9 @@
   },
   "homepage": "https://github.com/oldj/easy-fsm#readme",
   "devDependencies": {
-    "ava": "^0.25.0"
-  },
-  "ava": {
-    "files": [
-      "src/**/*.spec.js",
-      "test/*.spec.js",
-      "!**/node_modules/**/*.*"
-    ],
-    "source": [
-      "**/*.js",
-      "!dist/**/*"
-    ],
-    "match": [],
-    "concurrency": 5,
-    "failFast": true,
-    "tap": true,
-    "powerAssert": false
+    "prettier": "^3.2.5",
+    "vite": "^5.2.2",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.4.0"
   }
 }

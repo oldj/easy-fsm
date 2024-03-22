@@ -2,7 +2,6 @@
  * stateMachine.js
  */
 
-import { IMachineConfigs } from '../src/Machine'
 import EasyFSM from '../src'
 
 export const make = () => {

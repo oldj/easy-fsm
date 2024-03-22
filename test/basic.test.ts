@@ -3,7 +3,7 @@
  * @homepage: https://oldj.net
  */
 
-import { assert, test, describe, it } from 'vitest'
+import { assert, describe, it } from 'vitest'
 import EasyFSM from '../src'
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

@@ -3,10 +3,8 @@
  * @homepage: https://oldj.net
  */
 
-import { assert, test, describe, it } from 'vitest'
+import { assert, describe, it } from 'vitest'
 import EasyFSM from '../src'
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('events test', () => {
   it('on & off', async () => {
@@ -132,7 +130,7 @@ describe('events test', () => {
     let flag_enter = ''
     let flag_leave = ''
 
-    fsm.onEnter('ready', (...args) => {
+    fsm.onEnter('ready', () => {
       flag_enter = ''
     })
     fsm.onEnter('left_opened', (...args) => {

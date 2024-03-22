@@ -52,10 +52,13 @@ export default class Machine<TConfigs extends IMachineConfigs> {
 
     const state_leave = `${this.state.toString()}_leave`
     const state_enter = `${next_state}_enter`
+    const state_change = `state_change`
 
     let fns_leave = this.listeners_for_state_change[state_leave] || []
     let fns_enter = this.listeners_for_state_change[state_enter] || []
+    let fns_change = this.listeners_for_state_change[state_change] || []
 
+    // leave previous state
     this.next_state = next_state
     for (let fn of fns_leave) {
       try {
@@ -65,6 +68,19 @@ export default class Machine<TConfigs extends IMachineConfigs> {
       }
     }
 
+    // state change
+    for (let fn of fns_change) {
+      try {
+        await fn({
+          previous_state: this.state,
+          new_state: next_state,
+        })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    // enter next state
     this.previous_state = this.state
     this.state = next_state
     this.next_state = null
@@ -93,7 +109,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     return this.next_state
   }
 
-  private onStateChange(
+  private onStateEnterOrLeave(
     state: keyof TConfigs['states'],
     action: StateAction,
     callback: ActionFunc,
@@ -108,7 +124,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     this.listeners_for_state_change[key] = fns
   }
 
-  private offStateChange(
+  private offStateEnterOrLeave(
     state: keyof TConfigs['states'],
     action: StateAction,
     callback: ActionFunc,
@@ -120,19 +136,38 @@ export default class Machine<TConfigs extends IMachineConfigs> {
   }
 
   onEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
-    this.onStateChange(state, 'enter', callback)
+    this.onStateEnterOrLeave(state, 'enter', callback)
   }
 
   onLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
-    this.onStateChange(state, 'leave', callback)
+    this.onStateEnterOrLeave(state, 'leave', callback)
+  }
+
+  onStateChange(
+    callback: (d: {
+      previous_state: keyof TConfigs['states']
+      new_state: keyof TConfigs['states']
+    }) => void,
+  ) {
+    let key = 'state_change'
+    let fns = this.listeners_for_state_change[key] || []
+    fns.push(callback)
+    this.listeners_for_state_change[key] = fns
   }
 
   offEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
-    this.offStateChange(state, 'enter', callback)
+    this.offStateEnterOrLeave(state, 'enter', callback)
   }
 
   offLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
-    this.offStateChange(state, 'leave', callback)
+    this.offStateEnterOrLeave(state, 'leave', callback)
+  }
+
+  offStateChange(callback: ActionFunc) {
+    let key = 'state_change'
+    let fns = this.listeners_for_state_change[key] || []
+    fns = fns.filter((fn) => fn !== callback)
+    this.listeners_for_state_change[key] = fns
   }
 
   offAll() {

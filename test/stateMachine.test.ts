@@ -2,7 +2,7 @@
  * index.test.ts
  */
 
-import { assert, test, describe, it } from 'vitest'
+import { assert, describe, it } from 'vitest'
 import { make } from './stateMachine'
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

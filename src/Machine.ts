@@ -126,4 +126,16 @@ export default class Machine<TConfigs extends IMachineConfigs> {
   onLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
     this.onStateChange(state, 'leave', callback)
   }
+
+  offEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
+    this.offStateChange(state, 'enter', callback)
+  }
+
+  offLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
+    this.offStateChange(state, 'leave', callback)
+  }
+
+  offAll() {
+    this.listeners_for_state_change = {}
+  }
 }

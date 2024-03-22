@@ -16,12 +16,18 @@ export interface IMachineConfigs {
   }
 }
 
+type RecordKeys<T extends Record<string, any>> = keyof T
+
+type UnionKeys<T> = T extends Record<string, string> ? RecordKeys<T> : never
+
+type On<T> = UnionKeys<T extends { on: any } ? T['on'] : never>
+
 export default class Machine<TConfigs extends IMachineConfigs> {
-  private readonly configs: IMachineConfigs
-  private readonly states: Record<string, IMachineState>
-  private state: string
-  private previous_state: string | null = null
-  private next_state: string | null = null
+  private readonly configs: TConfigs
+  private readonly states: TConfigs['states']
+  private state: keyof TConfigs['states']
+  private previous_state: keyof TConfigs['states'] | null = null
+  private next_state: keyof TConfigs['states'] | null = null
   private listeners_for_state_change: Record<string, ActionFunc[]> = {}
 
   constructor(configs: TConfigs) {
@@ -30,7 +36,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     this.states = configs.states
   }
 
-  async fire(event: string, ...args: any[]) {
+  async fire(event: On<TConfigs['states'][keyof TConfigs['states']]>, ...args: any[]) {
     if (!this.canFire(event)) {
       throw new Error(`bad event: ${event.toString()}`)
     }
@@ -44,7 +50,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
       throw new Error(`bad state: ${next_state}`)
     }
 
-    const state_leave = `${this.state}_leave`
+    const state_leave = `${this.state.toString()}_leave`
     const state_enter = `${next_state}_enter`
 
     let fns_leave = this.listeners_for_state_change[state_leave] || []
@@ -71,7 +77,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     }
   }
 
-  canFire(event: string) {
+  canFire(event: On<TConfigs['states'][keyof TConfigs['states']]>) {
     return !!this.states[this.state].on?.[event as string]
   }
 

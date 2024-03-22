@@ -34,6 +34,7 @@ test('basic', async (t) => {
 
   assert.equal(m.getState(), 'init')
   assert.isTrue(m.canFire('loaded'))
+  // @ts-ignore
   assert.isFalse(m.canFire('not_exist'))
   assert.equal(is_leave_init, 0)
   assert.equal(is_enter_ready, 0)
@@ -45,6 +46,7 @@ test('basic', async (t) => {
 
   let err
   try {
+    // @ts-ignore
     await m.fire('ttt')
   } catch (e: any) {
     err = e.message

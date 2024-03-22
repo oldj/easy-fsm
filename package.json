@@ -1,10 +1,16 @@
 {
   "name": "easy-fsm",
-  "version": "1.0.0",
-  "description": "An easy-to-use finite state machine system for JavaScript.",
-  "main": "src/index.js",
+  "version": "2.0.0",
+  "description": "An easy-to-use finite state machine system for JavaScript/TypeScript.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "ava"
+    "test": "vitest --run",
+    "build": "vite build",
+    "p": "npm run test && npm run build && npm publish --access public"
   },
   "repository": {
     "type": "git",
@@ -20,22 +26,11 @@
   },
   "homepage": "https://github.com/oldj/easy-fsm#readme",
   "devDependencies": {
-    "ava": "^0.25.0"
-  },
-  "ava": {
-    "files": [
-      "src/**/*.spec.js",
-      "test/*.spec.js",
-      "!**/node_modules/**/*.*"
-    ],
-    "source": [
-      "**/*.js",
-      "!dist/**/*"
-    ],
-    "match": [],
-    "concurrency": 5,
-    "failFast": true,
-    "tap": true,
-    "powerAssert": false
+    "@types/node": "^20.11.30",
+    "prettier": "^3.2.5",
+    "vite": "^5.2.2",
+    "vite-plugin-dts": "^3.7.3",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.4.0"
   }
 }

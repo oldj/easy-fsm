@@ -1,6 +1,6 @@
 {
   "name": "easy-fsm",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "An easy-to-use finite state machine system for JavaScript/TypeScript.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

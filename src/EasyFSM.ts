@@ -60,6 +60,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
       throw new Error(`cannot_send: ${event.toString()}`)
     }
 
+    const previous_state = this._state
     const next_state = this._states[this._state].on?.[event as string]
     // if (!to_state) {
     //   throw new Error(`bad event: ${event}`)
@@ -90,26 +91,26 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
       }
     }
 
-    // state change
-    for (let fn of fns_change) {
+    // enter next state
+    this._previous_state = previous_state
+    this._state = next_state
+    this._next_state = null
+    for (let fn of fns_enter) {
       try {
-        let r = fn({
-          previous_state: this._state,
-          new_state: next_state,
-        })
+        let r = fn(options.payload)
         results.push(r)
       } catch (e) {
         console.error(e)
       }
     }
 
-    // enter next state
-    this._previous_state = this._state
-    this._state = next_state
-    this._next_state = null
-    for (let fn of fns_enter) {
+    // state change
+    for (let fn of fns_change) {
       try {
-        let r = fn(options.payload)
+        let r = fn({
+          previous_state,
+          new_state: next_state,
+        })
         results.push(r)
       } catch (e) {
         console.error(e)

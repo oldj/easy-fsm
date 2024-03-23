@@ -47,7 +47,7 @@ describe('events test', () => {
     }
     fsm.onEnter('right_opened', fn2)
 
-    assert.equal(fsm.getState(), 'loading')
+    assert.equal(fsm.state, 'loading')
     await fsm.sendAndWait('loaded')
     assert.equal(flag, '')
     await fsm.sendAndWait('open_left')
@@ -141,13 +141,13 @@ describe('events test', () => {
     })
 
     fsm.onEnter('right_opened', () => {
-      flag_enter = fsm.getPreviousState() || '11'
+      flag_enter = fsm.previous_state || '11'
     })
     fsm.onLeave('right_opened', () => {
-      flag_leave = fsm.getState()
+      flag_leave = fsm.state
     })
 
-    assert.equal(fsm.getState(), 'loading')
+    assert.equal(fsm.state, 'loading')
     await fsm.sendAndWait('loaded')
     assert.equal(flag_enter, '')
     await fsm.sendAndWait('open_left', { payload: 'aaa' })

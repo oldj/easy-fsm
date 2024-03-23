@@ -35,7 +35,7 @@ describe('basic', () => {
       is_enter_ready = 1
     })
 
-    assert.equal(m.getState(), 'init')
+    assert.equal(m.state, 'init')
     assert.isTrue(m.canSend('loaded'))
     // @ts-ignore
     assert.isFalse(m.canSend('not_exist'))
@@ -45,7 +45,7 @@ describe('basic', () => {
     await wait(1)
     assert.equal(is_leave_init, 1)
     assert.equal(is_enter_ready, 1)
-    assert.equal(m.getState(), 'ready')
+    assert.equal(m.state, 'ready')
 
     let err
     try {

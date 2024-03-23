@@ -6,7 +6,9 @@
 import { assert, describe, it } from 'vitest'
 import EasyFSM from '../src'
 
-describe('02', () => {
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+describe('03', () => {
   it('basic', async () => {
     let fsm = new EasyFSM({
       initial: 'loading',
@@ -37,23 +39,27 @@ describe('02', () => {
 
     let previous_state = ''
     let new_state = ''
-    fsm.onStateChange((d) => {
+    fsm.onStateChange(async (d) => {
+      await wait(1)
       previous_state = d.previous_state
       new_state = d.new_state
     })
 
-    assert.equal(fsm.state, 'loading')
-    assert.equal(previous_state, '')
-    assert.equal(new_state, '')
-
-    await fsm.sendAndWait('loaded')
+    fsm.send('loaded')
+    // await fsm.sendAndWait('loaded')
     assert.equal(fsm.state, 'ready')
+    assert.equal(previous_state, '')
+    await wait(2)
     assert.equal(previous_state, 'loading')
-    assert.equal(new_state, 'ready')
 
-    await fsm.sendAndWait('open_left')
+    fsm.send('open_left')
     assert.equal(fsm.state, 'left_opened')
+    assert.equal(previous_state, 'loading')
+    await wait(2)
     assert.equal(previous_state, 'ready')
-    assert.equal(new_state, 'left_opened')
+
+    await fsm.sendAndWait('close')
+    assert.equal(fsm.state, 'ready')
+    assert.equal(previous_state, 'left_opened')
   })
 })

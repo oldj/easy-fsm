@@ -34,21 +34,25 @@ console.log(fsm.getState()) // ready
 
 You can use `new EasyFSM(options)` to create a finite state machine.
 
-- **fire(event)**
+- **send(event)**
 
-Fire an event on current state.
+Send an event on current state.
 
-- **canFire(event)**
+- **sendAndWait(event)**
 
-Detect if the specified `event` can be fired.
+Send an event on current state and wait for all listeners to finish.
 
-- **getState()**
+- **canSend(event)**
+
+Detect if the specified `event` can be sent.
+
+- **[getter] state**
 
 Get the current state.
 
-- **getPreviousState()**
+- **[getter] previous_state**
 
-Get the last state.
+Get the previous state.
 
 - **onEnter(state, callback)**
 

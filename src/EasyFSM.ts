@@ -27,24 +27,32 @@ type UnionKeys<T> = T extends Record<string, string> ? RecordKeys<T> : never
 type On<T> = UnionKeys<T extends { on: any } ? T['on'] : never>
 
 export default class EasyFSM<TConfigs extends IMachineConfigs> {
-  private readonly configs: TConfigs
-  private readonly states: TConfigs['states']
-  private state: keyof TConfigs['states']
-  private previous_state: keyof TConfigs['states'] | null = null
-  private next_state: keyof TConfigs['states'] | null = null
-  private listeners_for_state_change: Record<string, ActionFunc[]> = {}
+  private readonly _configs: TConfigs
+  private readonly _states: TConfigs['states']
+  private _state: keyof TConfigs['states']
+  private _previous_state: keyof TConfigs['states'] | null = null
+  private _next_state: keyof TConfigs['states'] | null = null
+  private _listeners_for_state_change: Record<string, ActionFunc[]> = {}
 
   constructor(configs: TConfigs) {
-    this.configs = configs
-    this.state = configs.initial
-    this.states = configs.states
+    this._configs = configs
+    this._state = configs.initial
+    this._states = configs.states
   }
 
   send(event: On<TConfigs['states'][keyof TConfigs['states']]>, options: ISendEventOptions = {}) {
-    this.sendAndWait(event, options).catch(console.error)
+    this._send(event, options)
   }
 
   async sendAndWait(
+    event: On<TConfigs['states'][keyof TConfigs['states']]>,
+    options: ISendEventOptions = {},
+  ) {
+    let results = this._send(event, options)
+    await Promise.all(results)
+  }
+
+  private _send(
     event: On<TConfigs['states'][keyof TConfigs['states']]>,
     options: ISendEventOptions = {},
   ) {
@@ -52,28 +60,31 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
       throw new Error(`cannot_send: ${event.toString()}`)
     }
 
-    const next_state = this.states[this.state].on?.[event as string]
+    const next_state = this._states[this._state].on?.[event as string]
     // if (!to_state) {
     //   throw new Error(`bad event: ${event}`)
     // }
 
-    if (!next_state || !this.states[next_state]) {
+    if (!next_state || !this._states[next_state]) {
       throw new Error(`invalid_state: ${next_state}`)
     }
 
-    const state_leave = `${this.state.toString()}_leave`
+    const state_leave = `${this._state.toString()}_leave`
     const state_enter = `${next_state}_enter`
     const state_change = `state_change`
 
-    let fns_leave = this.listeners_for_state_change[state_leave] || []
-    let fns_enter = this.listeners_for_state_change[state_enter] || []
-    let fns_change = this.listeners_for_state_change[state_change] || []
+    let fns_leave = this._listeners_for_state_change[state_leave] || []
+    let fns_enter = this._listeners_for_state_change[state_enter] || []
+    let fns_change = this._listeners_for_state_change[state_change] || []
+
+    let results: (void | Promise<any>)[] = []
 
     // leave previous state
-    this.next_state = next_state
+    this._next_state = next_state
     for (let fn of fns_leave) {
       try {
-        await fn(options.payload)
+        let r = fn(options.payload)
+        results.push(r)
       } catch (e) {
         console.error(e)
       }
@@ -82,42 +93,46 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     // state change
     for (let fn of fns_change) {
       try {
-        await fn({
-          previous_state: this.state,
+        let r = fn({
+          previous_state: this._state,
           new_state: next_state,
         })
+        results.push(r)
       } catch (e) {
         console.error(e)
       }
     }
 
     // enter next state
-    this.previous_state = this.state
-    this.state = next_state
-    this.next_state = null
+    this._previous_state = this._state
+    this._state = next_state
+    this._next_state = null
     for (let fn of fns_enter) {
       try {
-        await fn(options.payload)
+        let r = fn(options.payload)
+        results.push(r)
       } catch (e) {
         console.error(e)
       }
     }
+
+    return results
   }
 
   canSend(event: On<TConfigs['states'][keyof TConfigs['states']]>) {
-    return !!this.states[this.state].on?.[event as string]
+    return !!this._states[this._state].on?.[event as string]
   }
 
-  getState() {
-    return this.state
+  get state() {
+    return this._state
   }
 
-  getPreviousState() {
-    return this.previous_state
+  get previous_state() {
+    return this._previous_state
   }
 
-  getNextState() {
-    return this.next_state
+  get next_state() {
+    return this._next_state
   }
 
   private onStateEnterOrLeave(
@@ -125,14 +140,14 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     action: StateAction,
     callback: ActionFunc,
   ) {
-    if (!this.states.hasOwnProperty(state)) {
+    if (!this._states.hasOwnProperty(state)) {
       throw new Error(`invalid_state: ${state.toString()}`)
     }
 
     let key = `${state.toString()}_${action}`
-    let fns = this.listeners_for_state_change[key] || []
+    let fns = this._listeners_for_state_change[key] || []
     fns.push(callback)
-    this.listeners_for_state_change[key] = fns
+    this._listeners_for_state_change[key] = fns
   }
 
   private offStateEnterOrLeave(
@@ -141,9 +156,9 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     callback: ActionFunc,
   ) {
     let key = `${state.toString()}_${action}`
-    let fns = this.listeners_for_state_change[key] || []
+    let fns = this._listeners_for_state_change[key] || []
     fns = fns.filter((fn) => fn !== callback)
-    this.listeners_for_state_change[key] = fns
+    this._listeners_for_state_change[key] = fns
   }
 
   onEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
@@ -161,9 +176,9 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     }) => void,
   ) {
     let key = 'state_change'
-    let fns = this.listeners_for_state_change[key] || []
+    let fns = this._listeners_for_state_change[key] || []
     fns.push(callback)
-    this.listeners_for_state_change[key] = fns
+    this._listeners_for_state_change[key] = fns
   }
 
   offEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
@@ -176,12 +191,12 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
 
   offStateChange(callback: ActionFunc) {
     let key = 'state_change'
-    let fns = this.listeners_for_state_change[key] || []
+    let fns = this._listeners_for_state_change[key] || []
     fns = fns.filter((fn) => fn !== callback)
-    this.listeners_for_state_change[key] = fns
+    this._listeners_for_state_change[key] = fns
   }
 
   offAll() {
-    this.listeners_for_state_change = {}
+    this._listeners_for_state_change = {}
   }
 }

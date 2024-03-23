@@ -16,13 +16,17 @@ export interface IMachineConfigs {
   }
 }
 
+export interface ISendEventOptions {
+  payload?: any
+}
+
 type RecordKeys<T extends Record<string, any>> = keyof T
 
 type UnionKeys<T> = T extends Record<string, string> ? RecordKeys<T> : never
 
 type On<T> = UnionKeys<T extends { on: any } ? T['on'] : never>
 
-export default class Machine<TConfigs extends IMachineConfigs> {
+export default class EasyFSM<TConfigs extends IMachineConfigs> {
   private readonly configs: TConfigs
   private readonly states: TConfigs['states']
   private state: keyof TConfigs['states']
@@ -36,9 +40,16 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     this.states = configs.states
   }
 
-  async fire(event: On<TConfigs['states'][keyof TConfigs['states']]>, ...args: any[]) {
-    if (!this.canFire(event)) {
-      throw new Error(`bad event: ${event.toString()}`)
+  send(event: On<TConfigs['states'][keyof TConfigs['states']]>, options: ISendEventOptions = {}) {
+    this.sendAndWait(event, options).catch(console.error)
+  }
+
+  async sendAndWait(
+    event: On<TConfigs['states'][keyof TConfigs['states']]>,
+    options: ISendEventOptions = {},
+  ) {
+    if (!this.canSend(event)) {
+      throw new Error(`cannot_send: ${event.toString()}`)
     }
 
     const next_state = this.states[this.state].on?.[event as string]
@@ -47,7 +58,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     // }
 
     if (!next_state || !this.states[next_state]) {
-      throw new Error(`bad state: ${next_state}`)
+      throw new Error(`invalid_state: ${next_state}`)
     }
 
     const state_leave = `${this.state.toString()}_leave`
@@ -62,7 +73,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     this.next_state = next_state
     for (let fn of fns_leave) {
       try {
-        await fn(...args)
+        await fn(options.payload)
       } catch (e) {
         console.error(e)
       }
@@ -86,14 +97,14 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     this.next_state = null
     for (let fn of fns_enter) {
       try {
-        await fn(...args)
+        await fn(options.payload)
       } catch (e) {
         console.error(e)
       }
     }
   }
 
-  canFire(event: On<TConfigs['states'][keyof TConfigs['states']]>) {
+  canSend(event: On<TConfigs['states'][keyof TConfigs['states']]>) {
     return !!this.states[this.state].on?.[event as string]
   }
 
@@ -115,7 +126,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
     callback: ActionFunc,
   ) {
     if (!this.states.hasOwnProperty(state)) {
-      throw new Error(`invalid state: ${state.toString()}`)
+      throw new Error(`invalid_state: ${state.toString()}`)
     }
 
     let key = `${state.toString()}_${action}`
@@ -144,7 +155,7 @@ export default class Machine<TConfigs extends IMachineConfigs> {
   }
 
   onStateChange(
-    callback: (d: {
+    callback: (t: {
       previous_state: keyof TConfigs['states']
       new_state: keyof TConfigs['states']
     }) => void,

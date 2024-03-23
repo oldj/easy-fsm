@@ -46,12 +46,12 @@ describe('02', () => {
     assert.equal(previous_state, '')
     assert.equal(new_state, '')
 
-    await fsm.fire('loaded')
+    await fsm.sendAndWait('loaded')
     assert.equal(fsm.getState(), 'ready')
     assert.equal(previous_state, 'loading')
     assert.equal(new_state, 'ready')
 
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(fsm.getState(), 'left_opened')
     assert.equal(previous_state, 'ready')
     assert.equal(new_state, 'left_opened')

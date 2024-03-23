@@ -48,55 +48,55 @@ describe('events test', () => {
     fsm.onEnter('right_opened', fn2)
 
     assert.equal(fsm.getState(), 'loading')
-    await fsm.fire('loaded')
+    await fsm.sendAndWait('loaded')
     assert.equal(flag, '')
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(flag, 'left_opened')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
     assert.equal(flag, 'left_opened')
-    await fsm.fire('open_right')
+    await fsm.sendAndWait('open_right')
     assert.equal(flag, 'right_opened')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
     assert.equal(flag, 'right_opened')
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(flag, 'left_opened')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
 
     fsm.offEnter('right_opened', fn2)
     assert.equal(flag, 'left_opened')
-    await fsm.fire('open_right')
+    await fsm.sendAndWait('open_right')
     assert.equal(flag, 'left_opened')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
 
     flag = '111'
     fsm.offEnter('left_opened', fn1)
     assert.equal(flag, '111')
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(flag, '111')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
 
     // rebinding
     fsm.onEnter('left_opened', fn1)
     fsm.onEnter('right_opened', fn2)
 
     flag = '222'
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(flag, 'left_opened')
-    await fsm.fire('close')
-    await fsm.fire('open_right')
+    await fsm.sendAndWait('close')
+    await fsm.sendAndWait('open_right')
     assert.equal(flag, 'right_opened')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
 
     // off all
     fsm.offAll()
 
     flag = '333'
-    await fsm.fire('open_left')
+    await fsm.sendAndWait('open_left')
     assert.equal(flag, '333')
-    await fsm.fire('close')
-    await fsm.fire('open_right')
+    await fsm.sendAndWait('close')
+    await fsm.sendAndWait('open_right')
     assert.equal(flag, '333')
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
   })
 
   it('enter & leave', async () => {
@@ -148,31 +148,31 @@ describe('events test', () => {
     })
 
     assert.equal(fsm.getState(), 'loading')
-    await fsm.fire('loaded')
+    await fsm.sendAndWait('loaded')
     assert.equal(flag_enter, '')
-    await fsm.fire('open_left', 'aaa', 'bbb')
+    await fsm.sendAndWait('open_left', { payload: 'aaa' })
     assert.equal(flag_enter, 'aaa')
     assert.equal(flag_leave, '')
 
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
     assert.equal(flag_enter, '')
     assert.equal(flag_leave, undefined)
 
-    await fsm.fire('open_right', 'xxx')
+    await fsm.sendAndWait('open_right', { payload: 'xxx' })
     assert.equal(flag_enter, 'ready')
 
-    await fsm.fire('close')
+    await fsm.sendAndWait('close')
     assert.equal(flag_leave, 'right_opened')
 
     flag_enter = ''
     flag_leave = ''
     // 清除所有事件
     fsm.offAll()
-    await fsm.fire('open_left', 'aaa', 'bbb')
+    await fsm.sendAndWait('open_left', { payload: 'aaa' })
     assert.equal(flag_enter, '')
     assert.equal(flag_leave, '')
-    await fsm.fire('close')
-    await fsm.fire('open_right', 'aaa', 'bbb')
+    await fsm.sendAndWait('close')
+    await fsm.sendAndWait('open_right', { payload: 'aaa' })
     assert.equal(flag_enter, '')
     assert.equal(flag_leave, '')
   })

@@ -10,7 +10,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('basic', () => {
   it('basic', async () => {
-    let m = new EasyFSM({
+    const configs = {
       initial: 'init',
       states: {
         init: {
@@ -20,7 +20,9 @@ describe('basic', () => {
         },
         ready: {},
       },
-    })
+    }
+    let m = new EasyFSM(configs)
+    // let m2: StateMachine<typeof configs> = m
 
     let is_leave_init = 0
     let is_enter_ready = 0
@@ -34,12 +36,12 @@ describe('basic', () => {
     })
 
     assert.equal(m.getState(), 'init')
-    assert.isTrue(m.canFire('loaded'))
+    assert.isTrue(m.canSend('loaded'))
     // @ts-ignore
-    assert.isFalse(m.canFire('not_exist'))
+    assert.isFalse(m.canSend('not_exist'))
     assert.equal(is_leave_init, 0)
     assert.equal(is_enter_ready, 0)
-    await m.fire('loaded')
+    await m.sendAndWait('loaded')
     await wait(1)
     assert.equal(is_leave_init, 1)
     assert.equal(is_enter_ready, 1)
@@ -48,10 +50,10 @@ describe('basic', () => {
     let err
     try {
       // @ts-ignore
-      await m.fire('ttt')
+      await m.sendAndWait('ttt')
     } catch (e: any) {
       err = e.message
     }
-    assert.isTrue(/bad event/.test(err))
+    assert.isTrue(/cannot_send/.test(err))
   })
 })

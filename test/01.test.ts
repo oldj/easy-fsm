@@ -3,10 +3,8 @@
  * @homepage: https://oldj.net
  */
 
-import { assert, test, describe, it } from 'vitest'
+import { assert, describe, it } from 'vitest'
 import EasyFSM from '../src'
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('01', () => {
   it('basic', async () => {
@@ -37,35 +35,35 @@ describe('01', () => {
       },
     })
 
-    assert.equal(fsm.getState(), 'loading')
-    await fsm.fire('loaded')
-    assert.equal(fsm.getState(), 'ready')
-    assert.isTrue(fsm.canFire('open_left'))
-    assert.isTrue(fsm.canFire('open_right'))
-    assert.isFalse(fsm.canFire('loaded'))
+    assert.equal(fsm.state, 'loading')
+    await fsm.sendAndWait('loaded')
+    assert.equal(fsm.state, 'ready')
+    assert.isTrue(fsm.canSend('open_left'))
+    assert.isTrue(fsm.canSend('open_right'))
+    assert.isFalse(fsm.canSend('loaded'))
 
-    await fsm.fire('open_left')
-    assert.equal(fsm.getState(), 'left_opened')
-    assert.isTrue(fsm.canFire('close'))
-    assert.isFalse(fsm.canFire('open_left'))
-    assert.isFalse(fsm.canFire('open_right'))
+    await fsm.sendAndWait('open_left')
+    assert.equal(fsm.state, 'left_opened')
+    assert.isTrue(fsm.canSend('close'))
+    assert.isFalse(fsm.canSend('open_left'))
+    assert.isFalse(fsm.canSend('open_right'))
 
-    await fsm.fire('close')
-    assert.equal(fsm.getState(), 'ready')
-    assert.isTrue(fsm.canFire('open_left'))
-    assert.isTrue(fsm.canFire('open_right'))
-    assert.isFalse(fsm.canFire('close'))
+    await fsm.sendAndWait('close')
+    assert.equal(fsm.state, 'ready')
+    assert.isTrue(fsm.canSend('open_left'))
+    assert.isTrue(fsm.canSend('open_right'))
+    assert.isFalse(fsm.canSend('close'))
 
-    await fsm.fire('open_right')
-    assert.equal(fsm.getState(), 'right_opened')
-    assert.isTrue(fsm.canFire('close'))
-    assert.isFalse(fsm.canFire('open_left'))
-    assert.isFalse(fsm.canFire('open_right'))
+    fsm.send('open_right')
+    assert.equal(fsm.state, 'right_opened')
+    assert.isTrue(fsm.canSend('close'))
+    assert.isFalse(fsm.canSend('open_left'))
+    assert.isFalse(fsm.canSend('open_right'))
 
-    await fsm.fire('close')
-    assert.equal(fsm.getState(), 'ready')
-    assert.isTrue(fsm.canFire('open_left'))
-    assert.isTrue(fsm.canFire('open_right'))
-    assert.isFalse(fsm.canFire('close'))
+    fsm.send('close')
+    assert.equal(fsm.state, 'ready')
+    assert.isTrue(fsm.canSend('open_left'))
+    assert.isTrue(fsm.canSend('open_right'))
+    assert.isFalse(fsm.canSend('close'))
   })
 })

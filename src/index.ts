@@ -2,8 +2,5 @@
  * index.ts
  */
 
-import Machine from './Machine'
-
-const EasyFSM = Machine
-
+import EasyFSM from './EasyFSM'
 export default EasyFSM

@@ -14,6 +14,7 @@ export interface IMachineConfigs {
   states: {
     [key: string /* state */]: IMachineState
   }
+  ignore_can_not_send_error?: boolean
 }
 
 export interface ISendEventOptions {
@@ -33,11 +34,13 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
   private _previous_state: keyof TConfigs['states'] | null = null
   private _next_state: keyof TConfigs['states'] | null = null
   private _listeners_for_state_change: Record<string, ActionFunc[]> = {}
+  private _ignore_can_not_send_error: boolean = false
 
   constructor(configs: TConfigs) {
     this._configs = configs
     this._state = configs.initial
     this._states = configs.states
+    this._ignore_can_not_send_error = !!configs.ignore_can_not_send_error
   }
 
   send(event: On<TConfigs['states'][keyof TConfigs['states']]>, options: ISendEventOptions = {}) {
@@ -57,6 +60,9 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     options: ISendEventOptions = {},
   ) {
     if (!this.canSend(event)) {
+      if (this._ignore_can_not_send_error) {
+        return []
+      }
       throw new Error(`cannot_send: ${event.toString()}, current: ${this._state.toString()}`)
     }
 

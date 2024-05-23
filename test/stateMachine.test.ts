@@ -24,10 +24,10 @@ describe('stateMachine', () => {
     try {
       await m.sendAndWait('load_fail')
     } catch (e: any) {
-      console.log(e)
+      // console.log(e)
       err = e.message
     }
-    console.log(111111111, err)
+    // console.log(111111111, err)
     assert.isTrue(/cannot_send/.test(err))
 
     await m.sendAndWait('rendered')
@@ -114,13 +114,15 @@ describe('stateMachine', () => {
       await m.sendAndWait('rendered')
     })
 
-    let tmp = 0
+    let tmp: any = 0
     // m.onEnter('hidden', (v) => {
     //   assert.equal(v, 123)
     // })
-    m.onEnter('disabled', (a, b) => {
+    m.onEnter('disabled', (a) => {
+      assert.equal(tmp, 0)
       tmp = a
-      assert.equal(b, 'abc')
+      // assert.equal(b, 'abc')
+      assert.equal(a.code, '456')
     })
 
     await m.sendAndWait('load')
@@ -129,7 +131,7 @@ describe('stateMachine', () => {
     assert.isTrue(m.canSend('disable'))
     assert.isFalse(m.canSend('enable'))
 
-    await m.sendAndWait('disable', { payload: 456 })
-    assert.equal(tmp, 456)
+    await m.sendAndWait('disable', { payload: { code: '456' } })
+    assert.equal(tmp.code, '456')
   })
 })

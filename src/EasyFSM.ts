@@ -57,7 +57,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     options: ISendEventOptions = {},
   ) {
     if (!this.canSend(event)) {
-      throw new Error(`cannot_send: ${event.toString()}`)
+      throw new Error(`cannot_send: ${event.toString()}, current: ${this._state.toString()}`)
     }
 
     const previous_state = this._state

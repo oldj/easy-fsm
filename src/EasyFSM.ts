@@ -35,6 +35,10 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
   private _next_state: keyof TConfigs['states'] | null = null
   private _listeners_for_state_change: Record<string, ActionFunc[]> = {}
   private _ignore_can_not_send_error: boolean = false
+  private _listeners_for_can_not_send_error: ((
+    event: On<TConfigs['states'][keyof TConfigs['states']]>,
+    current_state: keyof TConfigs['states'],
+  ) => void)[] = []
 
   constructor(configs: TConfigs) {
     this._configs = configs
@@ -60,6 +64,10 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     options: ISendEventOptions = {},
   ) {
     if (!this.canSend(event)) {
+      for (let fn of this._listeners_for_can_not_send_error) {
+        fn(event, this._state)
+      }
+
       if (this._ignore_can_not_send_error) {
         return []
       }
@@ -222,5 +230,29 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
 
   offAll() {
     this._listeners_for_state_change = {}
+  }
+
+  onCanNotSendError(
+    callback: (
+      event: On<TConfigs['states'][keyof TConfigs['states']]>,
+      current_state: keyof TConfigs['states'],
+    ) => void,
+  ) {
+    this._listeners_for_can_not_send_error.push(callback)
+  }
+
+  offCanNotSendError(
+    callback: (
+      event: On<TConfigs['states'][keyof TConfigs['states']]>,
+      current_state: keyof TConfigs['states'],
+    ) => void,
+  ) {
+    this._listeners_for_can_not_send_error = this._listeners_for_can_not_send_error.filter(
+      (fn) => fn !== callback,
+    )
+  }
+
+  offAllCanNotSendError() {
+    this._listeners_for_can_not_send_error = []
   }
 }

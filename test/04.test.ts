@@ -97,4 +97,9 @@ test('ignore_can_not_send_error', async () => {
   }
   expect(err2).toBeFalsy()
   expect(msg2).toBe('')
+
+  let states = fsm2.getAllStates()
+  let events = fsm2.getAllEvents()
+  expect(states).toEqual(['loading', 'ready', 'left_opened', 'right_opened'])
+  expect(events).toEqual(['loaded', 'open_left', 'open_right', 'close'])
 })

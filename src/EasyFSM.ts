@@ -142,6 +142,23 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     return this._next_state
   }
 
+  getAllStates() {
+    return Object.keys(this._states) as (keyof TConfigs['states'])[]
+  }
+
+  getAllEvents() {
+    let events: string[] = []
+    for (let state of this.getAllStates()) {
+      let on = this._states[state].on || {}
+      for (let event in on) {
+        if (!events.includes(event)) {
+          events.push(event)
+        }
+      }
+    }
+    return events as On<TConfigs['states'][keyof TConfigs['states']]>[]
+  }
+
   private onStateEnterOrLeave(
     state: keyof TConfigs['states'],
     action: StateAction,

@@ -36,24 +36,24 @@ describe('02', () => {
     })
 
     let previous_state = ''
-    let new_state = ''
+    let next_state = ''
     fsm.onStateChange((d) => {
       previous_state = d.previous_state
-      new_state = d.new_state
+      next_state = d.next_state
     })
 
     assert.equal(fsm.state, 'loading')
     assert.equal(previous_state, '')
-    assert.equal(new_state, '')
+    assert.equal(next_state, '')
 
     await fsm.sendAndWait('loaded')
     assert.equal(fsm.state, 'ready')
     assert.equal(previous_state, 'loading')
-    assert.equal(new_state, 'ready')
+    assert.equal(next_state, 'ready')
 
     await fsm.sendAndWait('open_left')
     assert.equal(fsm.state, 'left_opened')
     assert.equal(previous_state, 'ready')
-    assert.equal(new_state, 'left_opened')
+    assert.equal(next_state, 'left_opened')
   })
 })

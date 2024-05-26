@@ -123,7 +123,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
       try {
         let r = fn({
           previous_state,
-          new_state: next_state,
+          next_state: next_state,
         })
         results.push(r)
       } catch (e) {
@@ -204,7 +204,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
   onStateChange(
     callback: (t: {
       previous_state: keyof TConfigs['states']
-      new_state: keyof TConfigs['states']
+      next_state: keyof TConfigs['states']
     }) => void,
   ) {
     let key = 'state_change'

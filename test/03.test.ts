@@ -38,11 +38,11 @@ describe('03', () => {
     })
 
     let previous_state = ''
-    let new_state = ''
+    let next_state = ''
     fsm.onStateChange(async (d) => {
       await wait(1)
       previous_state = d.previous_state
-      new_state = d.new_state
+      next_state = d.next_state
     })
 
     fsm.send('loaded')

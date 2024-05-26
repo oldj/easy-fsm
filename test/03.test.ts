@@ -39,27 +39,34 @@ describe('03', () => {
 
     let previous_state = ''
     let next_state = ''
-    fsm.onStateChange(async (d) => {
+    let code = ''
+    fsm.onStateChange(async (t) => {
       await wait(1)
-      previous_state = d.previous_state
-      next_state = d.next_state
+      previous_state = t.previous_state
+      next_state = t.next_state
+      code = t.payload.code
     })
 
-    fsm.send('loaded')
+    fsm.send('loaded', { payload: { code: 'loaded' } })
     // await fsm.sendAndWait('loaded')
     assert.equal(fsm.state, 'ready')
     assert.equal(previous_state, '')
+    assert.equal(code, '')
     await wait(2)
     assert.equal(previous_state, 'loading')
+    assert.equal(code, 'loaded')
 
-    fsm.send('open_left')
+    fsm.send('open_left', { payload: { code: 'open_left' } })
     assert.equal(fsm.state, 'left_opened')
     assert.equal(previous_state, 'loading')
+    assert.equal(code, 'loaded')
     await wait(2)
     assert.equal(previous_state, 'ready')
+    assert.equal(code, 'open_left')
 
-    await fsm.sendAndWait('close')
+    await fsm.sendAndWait('close', { payload: { code: 'close' } })
     assert.equal(fsm.state, 'ready')
     assert.equal(previous_state, 'left_opened')
+    assert.equal(code, 'close')
   })
 })

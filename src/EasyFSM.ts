@@ -124,6 +124,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
         let r = fn({
           previous_state,
           next_state: next_state,
+          payload: options.payload,
         })
         results.push(r)
       } catch (e) {
@@ -205,6 +206,7 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     callback: (t: {
       previous_state: keyof TConfigs['states']
       next_state: keyof TConfigs['states']
+      payload: ISendEventOptions['payload']
     }) => void,
   ) {
     let key = 'state_change'

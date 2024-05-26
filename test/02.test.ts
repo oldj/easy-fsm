@@ -37,9 +37,9 @@ describe('02', () => {
 
     let previous_state = ''
     let next_state = ''
-    fsm.onStateChange((d) => {
-      previous_state = d.previous_state
-      next_state = d.next_state
+    fsm.onStateChange((t) => {
+      previous_state = t.previous_state
+      next_state = t.next_state
     })
 
     assert.equal(fsm.state, 'loading')

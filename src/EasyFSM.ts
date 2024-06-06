@@ -181,6 +181,10 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     let fns = this._listeners_for_state_change[key] || []
     fns.push(callback)
     this._listeners_for_state_change[key] = fns
+
+    return () => {
+      this.offStateEnterOrLeave(state, action, callback)
+    }
   }
 
   private offStateEnterOrLeave(
@@ -196,10 +200,18 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
 
   onEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
     this.onStateEnterOrLeave(state, 'enter', callback)
+
+    return () => {
+      this.offEnter(state, callback)
+    }
   }
 
   onLeave(state: keyof TConfigs['states'], callback: ActionFunc) {
     this.onStateEnterOrLeave(state, 'leave', callback)
+
+    return () => {
+      this.offLeave(state, callback)
+    }
   }
 
   onStateChange(
@@ -213,6 +225,10 @@ export default class EasyFSM<TConfigs extends IMachineConfigs> {
     let fns = this._listeners_for_state_change[key] || []
     fns.push(callback)
     this._listeners_for_state_change[key] = fns
+
+    return () => {
+      this.offStateChange(callback)
+    }
   }
 
   offEnter(state: keyof TConfigs['states'], callback: ActionFunc) {
